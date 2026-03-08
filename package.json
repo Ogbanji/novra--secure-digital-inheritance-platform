@@ -1,0 +1,22 @@
+{
+  "name": "novra",
+  "version": "1.0.0",
+  "description": "Novra - Secure Digital Inheritance Platform",
+  "main": "backend/server.js",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && node server.js",
+    "dev:frontend": "cd frontend && npm run dev",
+    "build": "npm run build:backend && npm run build:frontend",
+    "build:backend": "echo 'Backend ready'",
+    "build:frontend": "cd frontend && npm run build",
+    "start": "node backend/server.js"
+  },
+  "keywords": ["inheritance", "digital-assets", "blockchain", "security"],
+  "author": "Novra Team",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

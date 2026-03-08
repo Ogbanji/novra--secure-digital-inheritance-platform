@@ -1,0 +1,399 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                    NOVRA - SYSTEM ARCHITECTURE                               ║
+║                 Digital Inheritance Platform - Complete System               ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           USER INTERFACE LAYER                              │
+│                                                                              │
+│  ┌──────────────────────────────────────────────────────────────────────┐   │
+│  │ Next.js 14 Frontend (React + TypeScript)                            │   │
+│  │ ┌─────────────────┬─────────────────┬─────────────────┐             │   │
+│  │ │   Homepage      │   Dashboard     │   Onboarding    │             │   │
+│  │ │  (Marketing)    │   (Main App)    │    (Setup)      │             │   │
+│  │ └─────────────────┴─────────────────┴─────────────────┘             │   │
+│  │ ┌──────────────┬──────────────┬──────────────┐                       │   │
+│  │ │ Login/Reg    │  Vault Mgmt  │  Heir Mgmt   │                       │   │
+│  │ │ (Auth)       │  (Storage)   │  (Recipients)│                       │   │
+│  │ └──────────────┴──────────────┴──────────────┘                       │   │
+│  │ ┌──────────────┬──────────────┬──────────────┐                       │   │
+│  │ │ Rules Mgmt   │  Messages    │  Settings    │                       │   │
+│  │ │ (Triggers)   │  (Delivery)  │  (Security)  │                       │   │
+│  │ └──────────────┴──────────────┴──────────────┘                       │   │
+│  │                                                                      │   │
+│  │ ┌─────────────────────────────────────────────────────────────────┐ │   │
+│  │ │ State Management (Zustand)                                      │ │   │
+│  │ │  • authStore    (token, user data)                             │ │   │
+│  │ │  • vaultStore   (uploaded items)                               │ │   │
+│  │ │  • heirStore    (recipients)                                   │ │   │
+│  │ └─────────────────────────────────────────────────────────────────┘ │   │
+│  │                                                                      │   │
+│  │ ┌─────────────────────────────────────────────────────────────────┐ │   │
+│  │ │ Client-Side Encryption (crypto-js)                             │ │   │
+│  │ │  • AES-256 encryption                                           │ │   │
+│  │ │  • PBKDF2 key derivation                                        │ │   │
+│  │ │  • Nonce generation                                             │ │   │
+│  │ │  • Password hashing                                             │ │   │
+│  │ └─────────────────────────────────────────────────────────────────┘ │   │
+│  │                                                                      │   │
+│  │ HTTP Client (Axios)                                                │   │
+│  │  ├─ Auto-attach JWT tokens                                         │   │
+│  │  ├─ Handle 401 (token expired)                                     │   │
+│  │  └─ Add CORS headers                                               │   │
+│  └──────────────────────────────────────────────────────────────────────┘   │
+│                              ▼                                               │
+│                      HTTPS / TLS 1.3                                         │
+│                              ▼                                               │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           API GATEWAY LAYER                                 │
+│                                                                              │
+│  ┌──────────────────────────────────────────────────────────────────────┐   │
+│  │ Express.js Server (0.0.0.0:3000)                                    │   │
+│  │                                                                      │   │
+│  │ ┌────────────────────────────────────────────────────────────────┐  │   │
+│  │ │ Security Middleware                                            │  │   │
+│  │ │  • Helmet.js (HTTP headers)                                    │  │   │
+│  │ │  • CORS validation                                             │  │   │
+│  │ │  • Rate limiting (ready)                                       │  │   │
+│  │ │  • Body parsing                                                │  │   │
+│  │ └────────────────────────────────────────────────────────────────┘  │   │
+│  │                                                                      │   │
+│  │ ┌────────────────────────────────────────────────────────────────┐  │   │
+│  │ │ Authentication Middleware                                      │  │   │
+│  │ │  • JWT verification (Bearer token)                             │  │   │
+│  │ │  • Token expiration check (7 days)                             │  │   │
+│  │ │  • User context extraction                                     │  │   │
+│  │ └────────────────────────────────────────────────────────────────┘  │   │
+│  │                                                                      │   │
+│  │ ┌──────────────┬───────────────┬──────────────┬─────────────────┐  │   │
+│  │ │ Auth Routes  │ Vault Routes  │ Heir Routes  │ Inheritance     │  │   │
+│  │ │ (6 endpoints)│ (7 endpoints) │(8 endpoints) │ (8 endpoints)   │  │   │
+│  │ └──────────────┴───────────────┴──────────────┴─────────────────┘  │   │
+│  │                                                                      │   │
+│  │ ┌──────────────┬───────────────┬──────────────┐                    │   │
+│  │ │ Message Rts  │ SmartContract  │ Audit Logs   │                    │   │
+│  │ │ (5 endpoints)│ (6 endpoints)  │ (auto-tracked)                    │   │
+│  │ └──────────────┴───────────────┴──────────────┘                    │   │
+│  │                                                                      │   │
+│  │ Error Handling & Logging                                           │   │
+│  │  • Try-catch wrapping all routes                                   │   │
+│  │  • Console error logging                                           │   │
+│  │  • Audit trail to database                                         │   │
+│  │  • HTTP status codes (200, 201, 400, 401, 404, 500)               │   │
+│  └──────────────────────────────────────────────────────────────────────┘   │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                      BUSINESS LOGIC LAYER                                   │
+│                                                                              │
+│  ┌──────────────────────────────────────────────────────────────────────┐   │
+│  │ Encryption Service                                                  │   │
+│  │                                                                      │   │
+│  │ Symmetric Encryption (AES-256-GCM)                                  │   │
+│  │  • generateNonce()              → 16 bytes random                   │   │
+│  │  • deriveKey()                  → PBKDF2 (100K iterations)         │   │
+│  │  • encryptData()                → AES-256-GCM encrypt              │   │
+│  │  • decryptData()                → AES-256-GCM decrypt              │   │
+│  │  • encryptBinaryData()          → File encryption                  │   │
+│  │  • decryptBinaryData()          → File decryption                  │   │
+│  │                                                                      │   │
+│  │ Asymmetric Encryption (RSA-2048)                                    │   │
+│  │  • generateKeyPair()            → RSA key pairs for heirs          │   │
+│  │  • encryptForHeir()             → RSA public key encrypt           │   │
+│  │                                                                      │   │
+│  │ Key Management                                                      │   │
+│  │  • splitKeyIntoShares()         → Shamir's Secret Sharing           │   │
+│  │  • reconstructKeyFromShares()   → Reconstruct from 3-of-5          │   │
+│  │  • hashPassword()               → PBKDF2 + salt                    │   │
+│  │  • verifyPassword()             → Compare hashes                   │   │
+│  │                                                                      │   │
+│  │ Digital Signatures                                                  │   │
+│  │  • signData()                   → HMAC-SHA256                       │   │
+│  │  • verifySignature()            → Verify signature                 │   │
+│  │                                                                      │   │
+│  └──────────────────────────────────────────────────────────────────────┘   │
+│                                                                              │
+│  ┌──────────────────────────────────────────────────────────────────────┐   │
+│  │ Authentication Service                                              │   │
+│  │                                                                      │   │
+│  │ • generateJWT()         → Sign with JWT_SECRET                      │   │
+│  │ • verifyJWT()           → Verify token signature                    │   │
+│  │ • checkTokenExpiry()    → 7-day expiration                          │   │
+│  │ • extractUserId()       → Parse JWT payload                         │   │
+│  │                                                                      │   │
+│  └──────────────────────────────────────────────────────────────────────┘   │
+│                                                                              │
+│  ┌──────────────────────────────────────────────────────────────────────┐   │
+│  │ Vault Service                                                       │   │
+│  │                                                                      │   │
+│  │ • uploadFile()          → Encrypt, store, update usage             │   │
+│  │ • retrieveFile()        → Verify permissions, return encrypted     │   │
+│  │ • deleteFile()          → Decrypt verification, delete, cleanup    │   │
+│  │ • listVaults()          → User-scoped query with filtering          │   │
+│  │ • searchVaults()        → Full-text search on encrypted data        │   │
+│  │ • getStorageStats()     → Aggregate file sizes                      │   │
+│  │                                                                      │   │
+│  └──────────────────────────────────────────────────────────────────────┘   │
+│                                                                              │
+│  ┌──────────────────────────────────────────────────────────────────────┐   │
+│  │ Inheritance Rules Engine                                            │   │
+│  │                                                                      │   │
+│  │ • createRule()          → Dead-man switch / Time-locked / Condition │   │
+│  │ • triggerRule()         → When conditions met                       │   │
+│  │ • notifyHeirs()         → Email notification with key              │   │
+│  │ • checkInactivity()     → Compare last_activity + threshold        │   │
+│  │ • checkScheduledRelease()→ Compare current_time + release_date     │   │
+│  │ • generateDecryptKey()  → Temporary key for heir (30 days)         │   │
+│  │                                                                      │   │
+│  └──────────────────────────────────────────────────────────────────────┘   │
+│                                                                              │
+│  ┌──────────────────────────────────────────────────────────────────────┐   │
+│  │ Scheduled Tasks (node-cron)                                         │   │
+│  │                                                                      │   │
+│  │ Every Hour:                                                         │   │
+│  │  • Check all dead-man switch rules                                  │   │
+│  │  • Compare last_activity with inactivity_days threshold            │   │
+│  │  • Trigger inheritance if threshold exceeded                        │   │
+│  │                                                                      │   │
+│  │ Every Day:                                                          │   │
+│  │  • Check all time-locked rules                                      │   │
+│  │  • Compare release_date with current date                           │   │
+│  │  • Trigger scheduled releases                                       │   │
+│  │                                                                      │   │
+│  └──────────────────────────────────────────────────────────────────────┘   │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         DATA PERSISTENCE LAYER                              │
+│                                                                              │
+│  ┌──────────────────────────────────────────────────────────────────────┐   │
+│  │ SQLite Database (database.db - auto-initialized)                    │   │
+│  │                                                                      │   │
+│  │ ┌──────────────┐      ┌──────────────┐      ┌──────────────┐        │   │
+│  │ │   users      │      │   vaults     │      │    heirs     │        │   │
+│  │ │ ┌──────────┐ │      │ ┌──────────┐ │      │ ┌──────────┐ │        │   │
+│  │ │ │ id       │ │      │ │ id       │ │      │ │ id       │ │        │   │
+│  │ │ │ email    │ │      │ │ user_id  │ │      │ │ user_id  │ │        │   │
+│  │ │ │ pwd_hash │ │      │ │ enc_blob │ │──┐   │ │ email    │ │        │   │
+│  │ │ │ salt     │ │      │ │ nonce    │ │  │   │ │ name     │ │        │   │
+│  │ │ │ last_act │ │──┐   │ │ filename │ │  │   │ │ share %  │ │        │   │
+│  │ │ │ storage  │ │  │   │ │ size_mb  │ │  │   │ │ perms    │ │        │   │
+│  │ │ │ sec_ques │ │  │   │ │ recipients
+ │ │  │   │ pub_key │ │        │   │
+│  │ │ │ emerg_ct │ │  │   │ │ tags     │ │  │   │ │ status   │ │        │   │
+│  │ │ └──────────┘ │  │   │ └──────────┘ │  │   │ └──────────┘ │        │   │
+│  │ │ (9 fields)   │  │   │ (8 fields)  │  │   │ (10 fields) │        │   │
+│  │ └──────────────┘  │   └──────────────┘  │   └──────────────┘        │   │
+│  │                   │         ▲           │            ▲              │   │
+│  │                   │         │           └────────────┤──────────────┤   │
+│  │                   │         │                        │              │   │
+│  │                   └─────────┼────────────────────────┘              │   │
+│  │                             │ FK                                    │   │
+│  │                             │                                       │   │
+│  │ ┌──────────────┐            │    ┌──────────────┐   ┌─────────────┐│   │
+│  │ │inheritance_  │            │    │  messages    │   │smart_       ││   │
+│  │ │  rules       │            │    │              │   │ contracts   ││   │
+│  │ │ ┌──────────┐ │◄───────────┘    │ ┌──────────┐ │   │┌──────────┐││   │
+│  │ │ │ id       │ │                 │ │ id       │ │   ││ id       │││   │
+│  │ │ │ user_id  │ │                 │ │ user_id  │ │   ││ user_id  │││   │
+│  │ │ │ rule_type│ │                 │ │ enc_blob │ │   ││ type     │││   │
+│  │ │ │ trigger  │ │                 │ │ nonce    │ │   ││ address  │││   │
+│  │ │ │ rel_date │ │                 │ │ heir_id  │ │   ││ network  │││   │
+│  │ │ │ inact_dy │ │                 │ │ del_date │ │   ││ benefic. │││   │
+│  │ │ │ benef.   │ │                 │ │ is_deliv │ │   ││ status   │││   │
+│  │ │ │ vaults   │ │                 │ │ msg_type │ │   ││ deployed │││   │
+│  │ │ │ status   │ │                 │ │ title    │ │   │└──────────┘││   │
+│  │ │ └──────────┘ │                 │ └──────────┘ │   │(8 fields) ││   │
+│  │ │(10 fields)   │                 │(10 fields)  │   └────────────┘│   │
+│  │ └──────────────┘                 └──────────────┘                  │   │
+│  │                                                                      │   │
+│  │ ┌──────────────────────┐   ┌──────────────────────┐                │   │
+│  │ │ audit_logs           │   │heir_access_logs     │                │   │
+│  │ │ ┌────────────────┐   │   │ ┌────────────────┐  │                │   │
+│  │ │ │ id             │   │   │ │ id             │  │                │   │
+│  │ │ │ user_id        │   │   │ │ heir_id        │  │                │   │
+│  │ │ │ action         │   │   │ │ vault_id       │  │                │   │
+│  │ │ │ resource       │   │   │ │ accessed_at    │  │                │   │
+│  │ │ │ ip_address     │   │   │ │ access_type    │  │                │   │
+│  │ │ │ timestamp      │   │   │ │ ip_address     │  │                │   │
+│  │ │ └────────────────┘   │   │ └────────────────┘  │                │   │
+│  │ │ (7 fields)           │   │ (6 fields)         │                │   │
+│  │ └──────────────────────┘   └──────────────────────┘                │   │
+│  │                                                                      │   │
+│  │ Indexes (for performance):                                         │   │
+│  │  • users.email (UNIQUE)                                            │   │
+│  │  • vaults.user_id (FK)                                             │   │
+│  │  • heirs.user_id (FK)                                              │   │
+│  │  • inheritance_rules.user_id (FK)                                  │   │
+│  │  • messages.user_id (FK)                                           │   │
+│  │  • audit_logs.user_id (FK)                                         │   │
+│  │                                                                      │   │
+│  │ Encryption at Rest:                                                │   │
+│  │  • vaults.encrypted_content  → BLOB (not readable)                 │   │
+│  │  • messages.encrypted_content → BLOB (not readable)                │   │
+│  │  • smart_contracts.encrypted_abi → BLOB (not readable)             │   │
+│  │  • users.master_key_salt    → For key derivation only              │   │
+│  │                                                                      │   │
+│  └──────────────────────────────────────────────────────────────────────┘   │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        SECURITY DATA FLOW                                   │
+│                                                                              │
+│  User Password → Hash (PBKDF2, 100K iter) → Store as Password Hash         │
+│                                                                              │
+│  Vault File   → Nonce (random)                                             │
+│              → Key (PBKDF2 from password)                                  │
+│              → AES-256-GCM encrypt → Encrypted Blob + Auth Tag            │
+│              → Send to Server                                              │
+│              → Store in Database (unreadable)                              │
+│                                                                              │
+│  Heir Access  → Inheritance Trigger (inactivity/date)                     │
+│              → Generate Temporary Key (expires 30 days)                    │
+│              → Send Key to Heir (via email/link)                           │
+│              → Heir Uses Key to Decrypt Local Device                       │
+│                                                                              │
+│  User Logout  → Clear JWT token from localStorage                          │
+│              → Clear password from memory                                   │
+│              → Revoke session                                               │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        DEPLOYMENT ARCHITECTURE                              │
+│                                                                              │
+│  CreateOS Deployment:                                                       │
+│  ┌────────────────────────────────────────────────────────────────────┐     │
+│  │ Application Container                                              │     │
+│  │ ┌──────────────────────────────────────────────────────────────┐  │     │
+│  │ │ Port 0.0.0.0:3000                                           │  │     │
+│  │ │  ├─ Express Backend (production mode)                       │  │     │
+│  │ │  ├─ SQLite Database (persisted volume)                      │  │     │
+│  │ │  ├─ Node.js Runtime (v18+)                                  │  │     │
+│  │ │  └─ Cron Jobs (dead-man switch monitoring)                  │  │     │
+│  │ │                                                              │  │     │
+│  │ │ Environment Variables:                                      │  │     │
+│  │ │  • NODE_ENV=production                                      │  │     │
+│  │ │  • JWT_SECRET=<secure-random>                               │  │     │
+│  │ │  • DATABASE_URL=sqlite:///database.db                       │  │     │
+│  │ └──────────────────────────────────────────────────────────────┘  │     │
+│  │                                                                     │     │
+│  │ Static File Server (Next.js build)                                │     │
+│  │ ┌──────────────────────────────────────────────────────────────┐  │     │
+│  │ │ Port 3001 (or served from backend)                          │  │     │
+│  │ │  └─ Pre-built Next.js HTML/JS/CSS                           │  │     │
+│  │ └──────────────────────────────────────────────────────────────┘  │     │
+│  └────────────────────────────────────────────────────────────────────┘     │
+│                                                                              │
+│  Data Persistence:                                                          │
+│  ┌────────────────────────────────────────────────────────────────────┐     │
+│  │ Mounted Volume: /backend/database.db                              │     │
+│  │  • SQLite database file (auto-created on first run)               │     │
+│  │  • Auto-initialized with all tables and indexes                   │     │
+│  │  • Persists across container restarts                             │     │
+│  └────────────────────────────────────────────────────────────────────┘     │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+INFORMATION FLOWS:
+
+1. User Registration Flow
+   ┌─────────┐       ┌──────────────┐       ┌────────────┐
+   │ Browser │──────►│   Backend    │──────►│  SQLite DB │
+   │ (React) │  POST │  (Express)   │ Store │  (users)   │
+   │         │ /reg  │              │       │            │
+   └─────────┘       │ ✓ Hash pwd   │       └────────────┘
+                     │ ✓ Gen salt   │
+                     │ ✓ Gen JWT    │
+                     └──────────────┘
+                            │
+                            └──────────────► Return token
+
+2. File Upload Flow
+   ┌──────────────────────────────────────┐
+   │ Frontend (React)                     │
+   │ • User selects file                  │
+   │ • Generate random nonce              │
+   │ • Derive key from password (PBKDF2)  │
+   │ • AES-256 encrypt file               │
+   │ • Generate auth tag                  │
+   └──────────────────────────────────────┘
+              │ POST /api/vault/upload
+              │ {encrypted_blob, nonce, authTag}
+              ▼
+   ┌──────────────────────────────────────┐
+   │ Backend (Express)                    │
+   │ • Verify JWT token                   │
+   │ • Extract user_id from token         │
+   │ • Check storage limit                │
+   │ • Store encrypted blob in DB         │
+   │ • Update storage usage               │
+   └──────────────────────────────────────┘
+              │ Success response
+              ▼
+   ┌──────────────────────────────────────┐
+   │ Frontend (React)                     │
+   │ • Update vault state                 │
+   │ • Show file in list                  │
+   │ • Clear password from memory         │
+   └──────────────────────────────────────┘
+
+3. Inheritance Trigger Flow (Dead-Man Switch)
+   ┌──────────────────────────────────────┐
+   │ Cron Job (Every Hour)                │
+   │ • Query all dead-man-switch rules    │
+   │ • For each rule:                     │
+   │   - Check user.last_activity         │
+   │   - Compare against inactivity_days  │
+   │   - If exceeded → trigger_rule()     │
+   └──────────────────────────────────────┘
+              │ Rule Triggered
+              ▼
+   ┌──────────────────────────────────────┐
+   │ Backend                              │
+   │ • Generate temporary decryption key  │
+   │ • Create inheritance access record   │
+   │ • Send email to heir with link/key   │
+   │ • Update rule status to "triggered"  │
+   └──────────────────────────────────────┘
+              │ Email notification
+              ▼
+   ┌──────────────────────────────────────┐
+   │ Heir Email                           │
+   │ • "Your inheritance is ready"        │
+   │ • Click to claim with temp key       │
+   │ • Access expires in 30 days          │
+   └──────────────────────────────────────┘
+
+4. Heir File Retrieval Flow
+   ┌──────────────────────────────────────┐
+   │ Heir                                 │
+   │ • Click link in email                │
+   │ • Verify identity (security Q)       │
+   │ • Receive temp decryption key        │
+   └──────────────────────────────────────┘
+              │ Request vault item
+              ▼
+   ┌──────────────────────────────────────┐
+   │ Backend                              │
+   │ • Verify temp key is valid           │
+   │ • Check key hasn't expired           │
+   │ • Return encrypted vault blob        │
+   │ • Log access in heir_access_logs     │
+   └──────────────────────────────────────┘
+              │ Encrypted blob + nonce
+              ▼
+   ┌──────────────────────────────────────┐
+   │ Heir Browser                         │
+   │ • Receive encrypted data             │
+   │ • Use temp key to decrypt locally    │
+   │ • Display plaintext to heir          │
+   │ • Temp key expired after 30 days     │
+   └──────────────────────────────────────┘
+
+END OF ARCHITECTURE DIAGRAM
