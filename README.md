@@ -390,8 +390,8 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Support & Contact
 
-- Email: support@novra.app
-- Discord: https://discord.gg/novra
+- Email: mstahir3848@gmail.com
+- Discord: coming soon
 - GitHub Issues: For bug reports and feature requests
 
 ## Judges' Pitch
